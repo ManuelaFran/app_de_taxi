@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import './models/index';
+import rideRoutes from './routes/ride';
 
 dotenv.config();
 
@@ -10,6 +11,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
+
+app.use('/api', rideRoutes);
 
 const PORT = 8080;
 app.listen(PORT, () => {
