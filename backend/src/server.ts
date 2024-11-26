@@ -8,11 +8,12 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.use('/api', rideRoutes);
+
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-app.use('/api', rideRoutes);
 
 const PORT = 8080;
 app.listen(PORT, () => {

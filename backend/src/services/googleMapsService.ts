@@ -1,44 +1,39 @@
 import axios from 'axios';
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+export const calculateRoute = async (
+  origin: string,
+  destination: string
+): Promise<{
+  origin: { latitude: number; longitude: number };
+  destination: { latitude: number; longitude: number };
+  distance: number;
+  duration: string;
+  routeResponse: object;
+}> => {
+  const apiKey = process.env.GOOGLE_API_KEY;
+  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
 
-export const calculateRoute = async (origin: string, destination: string) => {
-  if (!GOOGLE_API_KEY) {
-    throw new Error('GOOGLE_API_KEY is not defined in the environment variables');
+  const response = await axios.get(url);
+  const data = response.data;
+
+  if (data.status !== 'OK') {
+    throw new Error('Failed to fetch route from Google Maps');
   }
 
-  const url = `https://routes.googleapis.com/directions/v2:computeRoutes`;
+  const route = data.routes[0];
+  const leg = route.legs[0]; // Pegamos a primeira perna da rota
 
-  const requestBody = {
+  return {
     origin: {
-      location: {
-        address: origin
-      }
+      latitude: leg.start_location.lat,
+      longitude: leg.start_location.lng,
     },
     destination: {
-      location: {
-        address: destination
-      }
+      latitude: leg.end_location.lat,
+      longitude: leg.end_location.lng,
     },
-    travelMode: 'DRIVE',
-    routingPreference: 'TRAFFIC_AWARE'
+    distance: leg.distance.value, // Distância em metros
+    duration: leg.duration.text, // Duração formatada (ex: "1 hour 30 mins")
+    routeResponse: data, // Resposta completa da API, caso seja útil
   };
-
-  try {
-    const response = await axios.post(url, requestBody, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_API_KEY
-      }
-    });
-  
-    return response.data;
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error('Error fetching route from Google Maps:', error.message);
-    } else {
-      console.error('Unknown error occurred:', error);
-    }
-    throw new Error('Failed to fetch route from Google Maps API');
-  }
 };

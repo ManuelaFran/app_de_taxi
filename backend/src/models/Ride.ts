@@ -5,6 +5,7 @@ class Ride extends Model {
   public origin!: string;
   public destination!: string;
   public distance!: number;
+  public duration!: string;
   public price!: number;
   public userId!: number;
   public driverId!: number;
@@ -26,6 +27,10 @@ class Ride extends Model {
       },
       distance: {
         type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      duration: {
+        type: DataTypes.STRING, // Tipo string para armazenar a duração formatada
         allowNull: false,
       },
       price: {

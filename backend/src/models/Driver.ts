@@ -5,8 +5,8 @@ class Driver extends Model {
   public name!: string;
   public description!: string;
   public vehicle!: string;
-  public rating!: number;
-  public pricePerKm!: number;
+  public review!: { rating: number; comment: string };
+  public value!: number;
 
   static initModel(sequelize: Sequelize) {
     Driver.init({
@@ -27,11 +27,11 @@ class Driver extends Model {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      rating: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
+      review: {
+        type: DataTypes.JSON,
+        allowNull: true,
       },
-      pricePerKm: {
+      value: {
         type: DataTypes.FLOAT,
         allowNull: false,
       },

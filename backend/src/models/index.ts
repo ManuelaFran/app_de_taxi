@@ -2,11 +2,20 @@ import { Sequelize } from 'sequelize';
 import User from './User';
 import Driver from './Driver';
 import Ride from './Ride';
+import dotenv from 'dotenv';
 
-const sequelize = new Sequelize('taxi_app', 'root', 'root', {
-  host: 'db',
-  dialect: 'mysql',
-});
+dotenv.config();
+
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'taxi_app',
+  process.env.DB_USER || 'root',    
+  process.env.DB_PASSWORD || 'root', 
+  {
+    host: process.env.DB_HOST || 'localhost', 
+    port: Number(process.env.DB_PORT) || 3306, 
+    dialect: 'mysql', 
+  }
+);
 
 const registerModels = () => {
   User.initModel(sequelize);

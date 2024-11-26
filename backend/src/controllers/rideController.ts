@@ -15,23 +15,31 @@ export const estimateRide = async (req: Request, res: Response): Promise<void> =
   }
 
   try {
+    // Obter os dados da rota, incluindo coordenadas, distância e duração
     const routeData = await calculateRoute(origin, destination);
 
+    // Obter motoristas disponíveis e calcular preços estimados
     const drivers = await Driver.findAll();
-    const priceEstimates = drivers.map((driver) => ({
-      driverId: driver.id,
-      driverName: driver.name,
+    const options = drivers.map((driver) => ({
+      id: driver.id,
+      name: driver.name,
+      description: driver.description,
       vehicle: driver.vehicle,
-      rating: driver.rating,
-      price: driver.pricePerKm * (routeData.distance / 1000), // preço por km
+      review: {
+        rating: driver.review,
+        comment: driver.review,
+      },
+      value: driver.value * (routeData.distance / 1000), // preço por km
     }));
 
+    // Responder com os dados formatados
     res.status(200).json({
-      origin,
-      destination,
+      origin: routeData.origin,
+      destination: routeData.destination,
       distance: routeData.distance,
       duration: routeData.duration,
-      priceEstimates,
+      options,
+      routeResponse: routeData.routeResponse,
     });
   } catch (error) {
     res.status(500).json({
@@ -53,18 +61,25 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
   }
 
   try {
+    // Calcula a duração e a distância usando a função calculateRoute
+    const routeData = await calculateRoute(origin, destination);
+
+    // Cria a corrida com duração e distância calculadas automaticamente
     const ride = await Ride.create({
       userId: customer_id,
       driverId: driver_id,
       origin,
       destination,
+      distance: routeData.distance / 1000, // Converte para quilômetros
+      duration: routeData.duration, // Duração formatada (ex: "15 minutes")
       price,
-      distance: 0, // Pode ser calculado se necessário
     });
 
     res.status(200).json({
       message: 'Ride confirmed successfully',
       rideId: ride.id,
+      distance: routeData.distance,
+      duration: routeData.duration,
     });
   } catch (error) {
     res.status(500).json({
@@ -84,7 +99,10 @@ export const getRideDetails = async (req: Request, res: Response): Promise<void>
       whereClause.driverId = driver_id;
     }
 
-    const rides = await Ride.findAll({ where: whereClause });
+    const rides = await Ride.findAll({
+      where: whereClause,
+      attributes: ['id', 'origin', 'destination', 'distance', 'duration', 'price', 'userId', 'driverId'],
+    });
 
     if (!rides.length) {
       res.status(404).json({ message: 'No rides found' });
