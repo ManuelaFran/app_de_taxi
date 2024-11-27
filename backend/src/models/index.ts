@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
   process.env.DB_USER || 'root',    
   process.env.DB_PASSWORD || 'root', 
   {
-    host: process.env.DB_HOST || 'localhost', 
+    host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 3306, 
     dialect: 'mysql', 
   }
@@ -26,7 +26,7 @@ const registerModels = () => {
 const syncDatabase = async () => {
   try {
     registerModels();
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
   } catch (error) {
     console.error(error instanceof Error ? error.message : 'Unknown error occurred');
   }
