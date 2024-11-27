@@ -25,6 +25,7 @@ class User extends Model {
       sequelize,
       modelName: 'User',
       tableName: 'users',
+      timestamps: true, // Ativa o rastreamento de criação/atualização
     });
   }
 }

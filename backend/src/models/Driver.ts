@@ -30,6 +30,13 @@ class Driver extends Model {
       review: {
         type: DataTypes.JSON,
         allowNull: true,
+        validate: {
+          isValidReview(value: any) {
+            if (value && (!value.rating || !value.comment)) {
+              throw new Error('Review must include both rating and comment');
+            }
+          },
+        },
       },
       value: {
         type: DataTypes.FLOAT,
@@ -39,6 +46,7 @@ class Driver extends Model {
       sequelize,
       modelName: 'Driver',
       tableName: 'drivers',
+      timestamps: true, // Ativa o rastreamento de criação/atualização
     });
   }
 }

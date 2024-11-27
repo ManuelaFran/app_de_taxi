@@ -1,9 +1,27 @@
-import sequelize from '../models/index';
-import Ride from '../models/Ride';
+import { Sequelize } from 'sequelize';
+import { initModels, Ride } from '../models/index';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'taxi_app',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || 'root',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 3306,
+    dialect: 'mysql',
+    logging: false,
+  }
+);
 
 const seedRides = async () => {
   try {
     await sequelize.authenticate();
+    console.log('Database connected successfully for seeding rides.');
+
+    initModels(sequelize);
 
     const rides = [
       {
@@ -27,12 +45,12 @@ const seedRides = async () => {
     ];
 
     await Ride.bulkCreate(rides);
-    console.log('Rides added successfully');
-    process.exit(0);
+    console.log('Rides added successfully!');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-    console.error(`Error seeding drivers: ${errorMessage}`);
-    process.exit(1);
+    console.error('Error seeding rides:', error instanceof Error ? error.message : error);
+  } finally {
+    await sequelize.close();
+    process.exit();
   }
 };
 

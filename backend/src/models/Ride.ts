@@ -30,7 +30,7 @@ class Ride extends Model {
         allowNull: false,
       },
       duration: {
-        type: DataTypes.STRING, // Tipo string para armazenar a duração formatada
+        type: DataTypes.STRING,
         allowNull: false,
       },
       price: {
@@ -49,6 +49,7 @@ class Ride extends Model {
       sequelize,
       modelName: 'Ride',
       tableName: 'rides',
+      timestamps: true, // Ativa o rastreamento de criação/atualização
     });
   }
 }
