@@ -9,42 +9,37 @@ export const estimateRide = async (req: Request, res: Response): Promise<void> =
   if (!origin || !destination || !customer_id) {
     res.status(400).json({
       error_code: 'INVALID_DATA',
-      error_description: 'Origin, destination, and customer_id are required',
+      error_description: 'Origin, destination, and customer_id are required.',
     });
     return;
   }
 
   try {
-    // Obter os dados da rota, incluindo coordenadas, distância e duração
     const routeData = await calculateRoute(origin, destination);
 
-    // Obter motoristas disponíveis e calcular preços estimados
     const drivers = await Driver.findAll();
     const options = drivers.map((driver) => ({
       id: driver.id,
       name: driver.name,
-      description: driver.description,
       vehicle: driver.vehicle,
       review: {
         rating: driver.review,
         comment: driver.review,
       },
-      value: driver.value * (routeData.distance / 1000), // preço por km
+      value: parseFloat((driver.value * (routeData.distance / 1000)).toFixed(2)), // preço por km arredondado
     }));
 
-    // Responder com os dados formatados
     res.status(200).json({
       origin: routeData.origin,
       destination: routeData.destination,
       distance: routeData.distance,
       duration: routeData.duration,
       options,
-      routeResponse: routeData.routeResponse,
     });
   } catch (error) {
     res.status(500).json({
       error_code: 'API_ERROR',
-      error_description: 'Failed to estimate ride',
+      error_description: 'Failed to estimate the ride. Please try again later.',
     });
   }
 };
@@ -55,28 +50,26 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
   if (!customer_id || !driver_id || !origin || !destination || !price) {
     res.status(400).json({
       error_code: 'INVALID_DATA',
-      error_description: 'All fields are required',
+      error_description: 'All fields are required.',
     });
     return;
   }
 
   try {
-    // Calcula a duração e a distância usando a função calculateRoute
     const routeData = await calculateRoute(origin, destination);
 
-    // Cria a corrida com duração e distância calculadas automaticamente
     const ride = await Ride.create({
-      userId: customer_id,
+      customerId: customer_id,
       driverId: driver_id,
       origin,
       destination,
-      distance: routeData.distance / 1000, // Converte para quilômetros
-      duration: routeData.duration, // Duração formatada (ex: "15 minutes")
-      price,
+      distance: parseFloat((routeData.distance / 1000).toFixed(2)), // Distância em km
+      duration: routeData.duration,
+      price: parseFloat(price.toFixed(2)),
     });
 
     res.status(200).json({
-      message: 'Ride confirmed successfully',
+      message: 'Ride confirmed successfully.',
       rideId: ride.id,
       distance: routeData.distance,
       duration: routeData.duration,
@@ -84,7 +77,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
   } catch (error) {
     res.status(500).json({
       error_code: 'DB_ERROR',
-      error_description: 'Failed to confirm ride',
+      error_description: 'Failed to confirm the ride. Please try again later.',
     });
   }
 };
@@ -94,18 +87,18 @@ export const getRideDetails = async (req: Request, res: Response): Promise<void>
   const { driver_id } = req.query;
 
   try {
-    const whereClause: any = { userId: customer_id };
+    const whereClause: any = { customerId: customer_id };
     if (driver_id) {
       whereClause.driverId = driver_id;
     }
 
     const rides = await Ride.findAll({
       where: whereClause,
-      attributes: ['id', 'origin', 'destination', 'distance', 'duration', 'price', 'userId', 'driverId'],
+      attributes: ['id', 'origin', 'destination', 'distance', 'duration', 'price', 'customerId', 'driverId'],
     });
 
     if (!rides.length) {
-      res.status(404).json({ message: 'No rides found' });
+      res.status(404).json({ message: 'No rides found.' });
       return;
     }
 
@@ -113,7 +106,7 @@ export const getRideDetails = async (req: Request, res: Response): Promise<void>
   } catch (error) {
     res.status(500).json({
       error_code: 'DB_ERROR',
-      error_description: 'Failed to fetch ride details',
+      error_description: 'Failed to fetch ride details. Please try again later.',
     });
   }
 };

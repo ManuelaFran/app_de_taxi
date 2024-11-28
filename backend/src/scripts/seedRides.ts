@@ -30,7 +30,7 @@ const seedRides = async () => {
         distance: 10.5,
         duration: '15 minutes',
         price: 15.75,
-        userId: 1,
+        customerId: '1',
         driverId: 1,
       },
       {
@@ -39,7 +39,7 @@ const seedRides = async () => {
         distance: 8.2,
         duration: '12 minutes',
         price: 12.30,
-        userId: 2,
+        customerId: '2',
         driverId: 2,
       },
     ];

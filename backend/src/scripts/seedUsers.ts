@@ -24,8 +24,8 @@ const seedUsers = async () => {
     initModels(sequelize);
 
     const users = [
-      { name: 'Alice Johnson', email: 'alice@example.com' },
-      { name: 'Bob Brown', email: 'bob@example.com' },
+      { id: '1', name: 'Alice Johnson', email: 'alice@example.com' },
+      { id: '2', name: 'Bob Brown', email: 'bob@example.com' },
     ];
 
     await User.bulkCreate(users);

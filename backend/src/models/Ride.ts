@@ -7,7 +7,7 @@ class Ride extends Model {
   public distance!: number;
   public duration!: string;
   public price!: number;
-  public userId!: number;
+  public customerId!: string;
   public driverId!: number;
 
   static initModel(sequelize: Sequelize) {
@@ -37,8 +37,8 @@ class Ride extends Model {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
-      userId: {
-        type: DataTypes.INTEGER,
+      customerId: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       driverId: {

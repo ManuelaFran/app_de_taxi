@@ -11,9 +11,9 @@ export const initModels = (sequelize: Sequelize) => {
   Ride.initModel(sequelize);
 
   // Configuração das associações
-  User.hasMany(Ride, { foreignKey: 'userId', as: 'rides' });
+  User.hasMany(Ride, { foreignKey: 'customerId', as: 'rides' });
   Driver.hasMany(Ride, { foreignKey: 'driverId', as: 'rides' });
-  Ride.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  Ride.belongsTo(User, { foreignKey: 'customerId', as: 'user' });
   Ride.belongsTo(Driver, { foreignKey: 'driverId', as: 'driver' });
 };
 
